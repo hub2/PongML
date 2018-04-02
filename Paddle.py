@@ -28,5 +28,5 @@ class Paddle:
 
     @property
     def y(self):
-        return (self.rect[1]+self.rect[3])/2
+        return self.rect[1]+(self.rect[3]/2)
 

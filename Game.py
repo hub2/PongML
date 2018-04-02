@@ -16,7 +16,7 @@ class Game:
         self.b = b
         self.size = size
 
-    def start(self):
+    def get_state(self):
         return GameState(self.p1.y, self.p2.y, self.b.pos, self.b.direction)
 
     def next_state(self, state, p1_move, p2_move):
@@ -44,16 +44,29 @@ class Game:
                 new_state.p2_y-(paddle_height//2) <= new_state.b_pos[1] <= new_state.p2_y + (paddle_height//2):
             new_state.b_dir = (new_state.b_dir[0]*(-1), new_state.b_dir[1])
 
-        new_state.b.pos = (new_state.b_pos[0] + new_state.b_dir[0], new_state.b_pos[1] + new_state.b_dir[1])
+        new_state.b_pos = (new_state.b_pos[0] + new_state.b_dir[0], new_state.b_pos[1] + new_state.b_dir[1])
 
-        if new_state.b_pos[0] <= 0:
-            w = Winner.P2
-        elif new_state.b_pos[0] >= size[0]:
-            w = Winner.P1
+        return new_state
+
+    def legal(self, state):
+        if paddle_height/2 <= state.p2_y + paddle_speed <= size[1] - paddle_height/2 and \
+                paddle_height/2 <= state.p2_y - paddle_speed <= size[1] - paddle_height/2:
+            return [Direction.UP, Direction.DOWN, Direction.NONE]
+        elif paddle_height/2 >= state.p2_y - paddle_speed:
+            return [Direction.DOWN, Direction.NONE]
+        elif state.p2_y + paddle_speed >= size[1] - paddle_height/2:
+            return [Direction.UP, Direction.NONE]
         else:
-            w = Winner.NONE
+            return []
 
-        return new_state, w
+    def winner(self, states):
+        #for new_state in states:
+        new_state = states[-1]
+        if new_state.b_dir[0] < 0 or new_state.b_pos[0] <= 0:
+            return Winner.P2
+        elif new_state.b_pos[0] >= size[0]:
+            return Winner.P1
+        return Winner.NONE
 
 
     def move(self, p1_move, p2_move):

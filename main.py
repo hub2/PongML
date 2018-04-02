@@ -6,6 +6,7 @@ from Ball import Ball
 from Driver import Driver
 from Game import Game, Winner
 from Paddle import Direction, move_map
+from SimplePlayer import SimplePlayer
 from config import *
 
 pygame.init()
@@ -23,26 +24,32 @@ def draw():
 
 last_p1 = Direction.NONE
 last_p2 = Direction.NONE
-m_player = MCTSPlayer(1)
+m_player = MCTSPlayer(1, 0.1, g)
+s_player = SimplePlayer(g)
 k = 0
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         if event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_w, pygame.K_a]:
-                last_p1 = move_map[event.key]
+                #last_p1 = move_map[event.key]
+                pass
             elif event.key in [pygame.K_p, pygame.K_l]:
                 #last_p2 = move_map[event.key]
                 pass
 
     draw()
     if k%20 == 0:
-        last_p2 = m_player.get_move(g)
+        m_player.update(g.get_state())
+        s_player.update(g.get_state())
+        last_p2 = m_player.get_move()
+        last_p1 = s_player.get_move()
         winner = g.move(last_p1, last_p2)
         if winner != Winner.NONE:
             sys.exit(0)
         last_p1 = Direction.NONE
         last_p2 = Direction.NONE
+
 
     k+=1
     pygame.display.flip()
